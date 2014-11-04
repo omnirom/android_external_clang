@@ -4,8 +4,8 @@
 // Test with pch.
 // RUN: %clang_cc1 -x objective-c -emit-pch -o %t %S/objc_container.h
 // RUN: %clang_cc1 -include-pch %t -fsyntax-only -verify %s 
-// RUN: %clang_cc1 -include-pch %t -ast-print %s | FileCheck -check-prefix=PRINT %s
-// RUN: %clang_cc1 -include-pch %t -emit-llvm -o - %s | FileCheck -check-prefix=IR %s
+// RUN: %clang_cc1 -include-pch %t -ast-print %s | FileCheck -check-prefix=CHECK-PRINT %s
+// RUN: %clang_cc1 -include-pch %t -emit-llvm -o - %s | FileCheck -check-prefix=CHECK-IR %s
 
 // expected-no-diagnostics
 
@@ -21,5 +21,5 @@
 // CHECK-IR: {{call.*objc_msgSend}}
 // CHECK-IR: ret void
 
-// CHECK: attributes #0 = { nounwind {{.*}} }
-// CHECK: attributes #1 = { nonlazybind }
+// CHECK-IR: attributes #0 = { nounwind {{.*}} }
+// CHECK-IR: attributes #1 = { nonlazybind }

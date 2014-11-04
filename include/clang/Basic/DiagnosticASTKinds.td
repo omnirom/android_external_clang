@@ -46,6 +46,8 @@ def note_constexpr_float_arithmetic : Note<
   "floating point arithmetic produces %select{an infinity|a NaN}0">;
 def note_constexpr_pointer_subtraction_not_same_array : Note<
   "subtracted pointers are not elements of the same array">;
+def note_constexpr_pointer_subtraction_zero_size : Note<
+  "subtraction of pointers to type %0 of zero size">;
 def note_constexpr_pointer_comparison_base_classes : Note<
   "comparison of addresses of subobjects of different base classes "
   "has unspecified value">;
@@ -87,6 +89,9 @@ def note_constexpr_call_limit_exceeded : Note<
   "constexpr evaluation hit maximum call limit">;
 def note_constexpr_step_limit_exceeded : Note<
   "constexpr evaluation hit maximum step limit; possible infinite loop?">;
+def note_constexpr_this : Note<
+  "%select{|implicit }0use of 'this' pointer is only allowed within the "
+  "evaluation of a call to a 'constexpr' member function">;
 def note_constexpr_lifetime_ended : Note<
   "%select{read of|assignment to|increment of|decrement of}0 "
   "%select{temporary|variable}1 whose lifetime has ended">;
@@ -136,6 +141,7 @@ def note_constexpr_calls_suppressed : Note<
   "(skipping %0 call%s0 in backtrace; use -fconstexpr-backtrace-limit=0 to "
   "see all)">;
 def note_constexpr_call_here : Note<"in call to '%0'">;
+
 def warn_integer_constant_overflow : Warning<
   "overflow in expression; result is %0 with type %1">,
   InGroup<DiagGroup<"integer-overflow">>;

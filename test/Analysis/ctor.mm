@@ -626,6 +626,30 @@ namespace ZeroInitialization {
       // initialized twice.
     }
   };
+
+  class Empty {
+  public:
+    Empty();
+  };
+
+  class PairContainer : public Empty {
+    raw_pair p;
+  public:
+    PairContainer() : Empty(), p() {
+      // This previously caused a crash because the empty base class looked
+      // like an initialization of 'p'.
+    }
+    PairContainer(int) : Empty(), p() {
+      // Test inlining something else here.
+    }
+  };
+
+  class PairContainerContainer {
+    int padding;
+    PairContainer pc;
+  public:
+    PairContainerContainer() : pc(1) {}
+  };
 }
 
 namespace InitializerList {
@@ -648,5 +672,35 @@ namespace InitializerList {
     List *list = new List{1, 2};
     // FIXME: When we handle constructors with 'new', this will be TRUE.
     clang_analyzer_eval(list->usedInitializerList); // expected-warning{{UNKNOWN}}
+  }
+}
+
+namespace PR19579 {
+  class C {};
+
+  void f() {
+    C();
+    int a;
+
+    extern void use(int);
+    use(a); // expected-warning{{uninitialized}}
+  }
+
+  void g() {
+    struct S {
+      C c;
+      int i;
+    };
+    
+    // This order triggers the initialization of the inner "a" after the
+    // constructor for "C" is run, which used to confuse the analyzer
+    // (is "C()" the initialization of "a"?).
+    struct S s = {
+      C(),
+      ({
+        int a, b = 0;
+        0;
+      })
+    };
   }
 }
